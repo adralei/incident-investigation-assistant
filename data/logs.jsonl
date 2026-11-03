@@ -1,0 +1,6 @@
+{"log_id":"log-001","timestamp":"2026-10-20T08:59:00Z","service":"checkout-api","level":"INFO","status_code":200,"message":"GET /health completed"}
+{"log_id":"log-002","timestamp":"2026-10-20T09:03:00Z","service":"checkout-api","level":"INFO","status_code":200,"message":"GET /orders completed"}
+{"log_id":"log-003","timestamp":"2026-10-20T09:07:00Z","service":"checkout-api","level":"ERROR","status_code":500,"message":"GET /orders failed"}
+{"log_id":"log-004","timestamp":"2026-10-20T09:08:00Z","service":"checkout-api","level":"ERROR","status_code":500,"message":"POST /checkout failed"}
+{"log_id":"log-005","timestamp":"2026-10-20T09:09:00Z","service":"billing-api","level":"ERROR","status_code":500,"message":"POST /payment failed"}
+{"log_id":"log-006","timestamp":"2026-10-20T09:16:00Z","service":"checkout-api","level":"ERROR","status_code":500,"message":"POST /checkout failed"}

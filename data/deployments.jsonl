@@ -1,0 +1,4 @@
+
+{"deployment_id":"dep-001","timestamp":"2026-10-20T09:05:00Z","service":"checkout-api","version":"v1.5.1","status":"succeeded"}
+{"deployment_id":"dep-002","timestamp":"2026-10-20T09:06:00Z","service":"billing-api","version":"v2.3.0","status":"succeeded"}
+{"deployment_id":"dep-003","timestamp":"2026-10-20T08:30:00Z","service":"checkout-api","version":"v1.5.0","status":"succeeded"}

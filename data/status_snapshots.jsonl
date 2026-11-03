@@ -1,0 +1,4 @@
+
+{"snapshot_id":"svc-001","timestamp":"2026-10-20T09:02:00Z","service":"checkout-api","state":"healthy","ready_replicas":3,"desired_replicas":3}
+{"snapshot_id":"svc-002","timestamp":"2026-10-20T09:12:00Z","service":"checkout-api","state":"degraded","ready_replicas":2,"desired_replicas":3}
+{"snapshot_id":"svc-003","timestamp":"2026-10-20T09:12:00Z","service":"billing-api","state":"healthy","ready_replicas":2,"desired_replicas":2}
