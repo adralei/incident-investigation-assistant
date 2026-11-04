@@ -9,7 +9,9 @@ from openai import OpenAI
 
 from tool_dispatcher import dispatch_tool
 from tool_contract import ToolError, ToolResult
+
 from report_schema import IncidentReport
+from evidence_validator import register_evidence, validate_evidence
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -184,6 +186,8 @@ def run_agent(user_message: str) -> None:
 
     seen_calls = set()
 
+    evidence_registry = {}
+
     tool_count = 0
     input_tokens = 0
     output_tokens = 0
@@ -251,6 +255,28 @@ def run_agent(user_message: str) -> None:
 
                     print("\n=== REPORT VALIDATION ===")
                     print("Schema validation: PASS")
+
+                    evidence_errors = validate_evidence(
+                        validated_report,
+                        evidence_registry,
+                    )
+
+                    print("\n=== EVIDENCE VALIDATION ===")
+
+                    if evidence_errors:
+                        print("Reference validation: FAIL")
+
+                        for error in evidence_errors:
+                            print("-", error)
+
+                        report_generated = False
+                    else:
+                        print("Reference validation: PASS")
+                        print(
+                            "Registered sources:",
+                            len(evidence_registry),
+                        )
+
                     print("Findings:", len(validated_report.findings))
                     print("Hypotheses:", len(validated_report.hypotheses))
                     print(
@@ -318,6 +344,11 @@ def run_agent(user_message: str) -> None:
             else:
                 data = result.data
                 print("Records:", data.get("count"))
+                register_evidence(
+                    evidence_registry,
+                    call.name,
+                    data,
+                )
 
                 if call.name == "search_runbooks":
                     used = data.get("embedding_tokens", 0)
