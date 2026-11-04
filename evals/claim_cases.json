@@ -1,0 +1,31 @@
+
+[
+  {
+    "case_id": "claim-001",
+    "claim": "09:07 UTC'de GET /orders isteği HTTP 500 ile başarısız oldu.",
+    "source_ids": ["log-003"],
+    "expected_label": "supported",
+    "reason": "Log kaydı zamanı, endpoint'i ve HTTP 500 kodunu doğruluyor."
+  },
+  {
+    "case_id": "claim-002",
+    "claim": "09:07 UTC'de GET /orders isteği HTTP 503 ile başarısız oldu.",
+    "source_ids": ["log-003"],
+    "expected_label": "contradicted",
+    "reason": "Kaynakta HTTP 503 değil, HTTP 500 kayıtlı."
+  },
+  {
+    "case_id": "claim-003",
+    "claim": "Veritabanı tamamen çöktü.",
+    "source_ids": ["log-003"],
+    "expected_label": "insufficient_evidence",
+    "reason": "Log kaydında veritabanı durumuna ilişkin bilgi yok."
+  },
+  {
+    "case_id": "claim-004",
+    "claim": "09:05 deployment'ı kesin olarak HTTP 500 hatalarına neden oldu.",
+    "source_ids": ["dep-001", "log-003", "log-004"],
+    "expected_label": "insufficient_evidence",
+    "reason": "Olayların zaman sıralaması mevcut, fakat nedensel bağlantı kanıtlanmış değil."
+  }
+]
