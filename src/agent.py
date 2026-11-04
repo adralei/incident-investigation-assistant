@@ -9,6 +9,7 @@ from openai import OpenAI
 
 from tool_dispatcher import dispatch_tool
 from tool_contract import ToolError, ToolResult
+from report_schema import IncidentReport
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -132,6 +133,48 @@ TOOLS = [
 ]
 
 
+
+def generate_structured_report(
+    client: OpenAI,
+    history: list,
+) -> tuple[IncidentReport | None, object]:
+    """Toplanan kanıtlardan doğrulanmış rapor oluşturur."""
+
+    response = client.responses.parse(
+        model=MODEL,
+        instructions=(
+            INSTRUCTIONS
+            + """
+
+            Sonucun IncidentReport şemasına uygun olmalı.
+            Yalnızca mevcut konuşma geçmişindeki operasyonel
+            kayıtları ve runbook sonuçlarını kullan.
+
+            Yeni olay, kaynak kimliği veya araç sonucu uydurma.
+            Bir hipotezin doğrudan kanıtı yoksa supporting_source_ids
+            boş olabilir; belirsizliği uncertainty alanında açıkla.
+
+            Runbook kaynaklarını gözlenen olay kanıtı gibi gösterme.
+            Yapılandırılmış raporu Türkçe oluştur.
+            """
+        ),
+        input=history + [
+            {
+                "role": "user",
+                "content": (
+                    "Yukarıdaki incelemeyi yalnızca elde edilmiş "
+                    "kanıtlara dayanarak IncidentReport şemasında "
+                    "yapılandır. Önceki incelemeye yeni olgular ekleme."
+                ),
+            }
+        ],
+        text_format=IncidentReport,
+    )
+
+    return response.output_parsed, response
+
+
+
 def run_agent(user_message: str) -> None:
     client = OpenAI()
 
@@ -175,14 +218,53 @@ def run_agent(user_message: str) -> None:
             if item.type == "function_call"
         ]
 
+
         if not calls:
-            print("\n=== INCIDENT REPORT ===")
-            print(
-                response.output_text
-                or "Model kullanılabilir bir rapor üretmedi."
-            )
-            report_generated = bool(response.output_text)
+            print("\n=== STRUCTURED REPORT ===")
+
+            try:
+                report, structured_response = (
+                    generate_structured_report(client, history)
+                )
+
+                if structured_response.usage:
+                    input_tokens += (
+                        structured_response.usage.input_tokens
+                    )
+                    output_tokens += (
+                        structured_response.usage.output_tokens
+                    )
+
+                if report is None:
+                    print("Structured report was not generated.")
+                else:
+                    # SDK'dan dönen nesneyi ayrıca doğruluyoruz.
+                    validated_report = IncidentReport.model_validate(
+                        report.model_dump()
+                    )
+
+                    print(
+                        validated_report.model_dump_json(indent=2)
+                    )
+
+                    report_generated = True
+
+                    print("\n=== REPORT VALIDATION ===")
+                    print("Schema validation: PASS")
+                    print("Findings:", len(validated_report.findings))
+                    print("Hypotheses:", len(validated_report.hypotheses))
+                    print(
+                        "Recommended checks:",
+                        len(validated_report.recommended_checks),
+                    )
+
+            except Exception as exc:
+                print("Structured report generation failed.")
+                print("Error type:", type(exc).__name__)
+                print("Error:", str(exc))
+
             break
+
 
         for call in calls:
 
