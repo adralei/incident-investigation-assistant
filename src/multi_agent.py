@@ -14,6 +14,7 @@ from report_schema import IncidentReport
 from runbook_specialist import run_specialist
 from tool_contract import ToolError, ToolResult
 from tool_dispatcher import dispatch_tool
+from metrics import AgentMetrics, aggregate_metrics
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -139,6 +140,7 @@ def run_multi_agent(user_message: str) -> None:
     ]
 
     evidence_registry = {}
+    specialist_metrics = []
     successful_operations = set()
     seen_calls = set()
 
@@ -309,7 +311,10 @@ def run_multi_agent(user_message: str) -> None:
                             delegation_count += 1
 
                             # Uzmanın gerçek agent döngüsü.
-                            specialist = run_specialist(request)
+                            specialist = run_specialist(
+                                request,
+                                metrics_sink=specialist_metrics,
+                            )
 
                             if specialist.status == "error":
                                 result = tool_error(
@@ -376,10 +381,40 @@ def run_multi_agent(user_message: str) -> None:
     print("Main duration (seconds):", round(elapsed, 2))
     print("Registered evidence:", len(evidence_registry))
 
-    print(
-        "Note: Specialist tokens are printed separately "
-        "by runbook_specialist.py."
+    
+    print("\n=== COMBINED MULTI-AGENT METRICS ===")
+
+    main_metrics = AgentMetrics(
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        embedding_tokens=0,
+        duration_seconds=elapsed,
     )
+
+    if delegation_count > 0 and not specialist_metrics:
+        print("Combined metrics unavailable.")
+        print("Specialist metrics were not collected.")
+
+    else:
+        # İlk sürümde en fazla bir uzman delegasyonu var.
+        specialist_usage = (
+            specialist_metrics[0]
+            if specialist_metrics
+            else AgentMetrics(
+                input_tokens=0,
+                output_tokens=0,
+                embedding_tokens=0,
+                duration_seconds=0.0,
+            )
+        )
+
+        combined = aggregate_metrics(
+            main_metrics,
+            specialist_usage,
+        )
+
+        print(combined.model_dump_json(indent=2))
+
 
 
 if __name__ == "__main__":

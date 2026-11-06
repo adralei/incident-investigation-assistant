@@ -14,6 +14,8 @@ from delegation_contract import (
 
 from specialist_dispatcher import dispatch_specialist_tool
 
+from metrics import AgentMetrics
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -89,6 +91,7 @@ def make_failure(
 
 def run_specialist(
     request: DelegationRequest,
+    metrics_sink: list[AgentMetrics] | None = None,
 ) -> SpecialistResult:
     """Sınırlı bağlamla çalışan runbook uzmanı."""
 
@@ -300,6 +303,17 @@ def run_specialist(
     print("Output tokens:", output_tokens)
     print("Embedding tokens:", embedding_tokens)
     print("Duration (seconds):", round(elapsed, 2))
+
+
+    if metrics_sink is not None:
+        metrics_sink.append(
+            AgentMetrics(
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                embedding_tokens=embedding_tokens,
+                duration_seconds=elapsed,
+            )
+        )
 
     return result
 
