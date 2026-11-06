@@ -11,7 +11,8 @@ from delegation_contract import (
     DelegationRequest,
     SpecialistResult,
 )
-from tool_dispatcher import dispatch_tool
+
+from specialist_dispatcher import dispatch_specialist_tool
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -159,7 +160,7 @@ def run_specialist(
 
             print("Arguments:", arguments)
 
-            tool_result = dispatch_tool(
+            tool_result = dispatch_specialist_tool(
                 call.name,
                 arguments,
             )
