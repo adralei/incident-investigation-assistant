@@ -15,6 +15,7 @@ from runbook_specialist import run_specialist
 from tool_contract import ToolError, ToolResult
 from tool_dispatcher import dispatch_tool
 from metrics import AgentMetrics, aggregate_metrics
+from report_store import save_report
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -237,6 +238,13 @@ def run_multi_agent(user_message: str) -> None:
                         print("Error:", error)
 
                     report_generated = not errors
+
+                    if report_generated:
+                        saved_path = save_report(
+                            report,
+                            "multi_agent",
+                        )
+                        print("Report saved:", saved_path)
 
             except Exception as exc:
                 print("Report generation failed.")

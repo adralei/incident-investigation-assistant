@@ -13,6 +13,8 @@ from tool_contract import ToolError, ToolResult
 from report_schema import IncidentReport
 from evidence_validator import register_evidence, validate_evidence
 
+from report_store import save_report
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
@@ -276,6 +278,11 @@ def run_agent(user_message: str) -> None:
                             "Registered sources:",
                             len(evidence_registry),
                         )
+                        saved_path = save_report(
+                            validated_report,
+                            "single_agent",
+                        )
+                        print("Report saved:", saved_path)
 
                     print("Findings:", len(validated_report.findings))
                     print("Hypotheses:", len(validated_report.hypotheses))
