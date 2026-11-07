@@ -1,0 +1,23 @@
+
+[
+  {
+    "architecture": "single_agent",
+    "scenario": "checkout-api-20261020",
+    "input_tokens": 9216,
+    "output_tokens": 2230,
+    "embedding_tokens": 306,
+    "duration_seconds": 31.75,
+    "schema_valid": true,
+    "references_valid": true
+  },
+  {
+    "architecture": "multi_agent",
+    "scenario": "checkout-api-20261020",
+    "input_tokens": 11461,
+    "output_tokens": 3096,
+    "embedding_tokens": 349,
+    "duration_seconds": 46.63,
+    "schema_valid": true,
+    "references_valid": true
+  }
+]
