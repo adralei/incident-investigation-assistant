@@ -184,16 +184,62 @@ def run_multi_agent(user_message: str) -> None:
             print("\n=== STRUCTURED INCIDENT REPORT ===")
 
             try:
+
+                operational_sources = sorted(
+                    source_id
+                    for source_id, source_type
+                    in evidence_registry.items()
+                    if source_type == "operational"
+                )
+
+                runbook_sources = sorted(
+                    source_id
+                    for source_id, source_type
+                    in evidence_registry.items()
+                    if source_type == "runbook"
+                )
+
+                source_rules = f"""
+                KAYNAK KULLANIM SÖZLEŞMESİ:
+
+                1. findings[].source_ids alanında yalnızca
+                   operasyonel kaynaklar kullanılabilir.
+
+                2. hypotheses[].supporting_source_ids alanında
+                   yalnızca operasyonel kaynaklar kullanılabilir.
+
+                3. recommended_checks[].runbook_source_ids alanında
+                   yalnızca runbook kaynakları kullanılabilir.
+
+                4. Kaynak kimliklerini harfiyen kopyala.
+                   Satır aralıklarını birleştirme, genişletme
+                   veya yeni kaynak kimliği üretme.
+
+                5. Uygun kaynak yoksa kanıt uydurma.
+                   Hipotezlerde supporting_source_ids boş olabilir.
+
+                İZİNLİ OPERASYONEL KAYNAKLAR:
+                {json.dumps(operational_sources, ensure_ascii=False)}
+
+                İZİNLİ RUNBOOK KAYNAKLARI:
+                {json.dumps(runbook_sources, ensure_ascii=False)}
+                """
+
                 final_response = client.responses.parse(
                     model=MODEL,
-                    instructions=INSTRUCTIONS + """
-                    Toplanan kanıtlarla IncidentReport oluştur.
-                    Operasyonel bulgular için operasyonel kaynaklar,
-                    runbook önerileri için uzman kaynakları kullan.
-                    Uzmanın döndürmediği kaynakları uydurma.
-                    Belirsizliği açıkça belirt.
-                    Türkçe yaz.
-                    """,
+                    instructions=(
+                        INSTRUCTIONS
+                        + source_rules
+                        + """
+                        Toplanan kanıtlarla IncidentReport oluştur.
+                        Şema alanlarına göre kaynak türü kurallarına uy.
+                        Yalnızca izin verilen kaynak kimliklerini kullan.
+                        Operasyonel bulgular ile runbook önerilerini ayır.
+                        Zamansal korelasyonu nedensellik olarak sunma.
+                        Belirsizliği açıkça belirt.
+                        Türkçe yaz.
+                        """
+                    ),
                     input=history + [
                         {
                             "role": "user",
