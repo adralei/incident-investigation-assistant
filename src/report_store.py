@@ -52,4 +52,3 @@ def save_report(
     )
 
     return target_file
-s
