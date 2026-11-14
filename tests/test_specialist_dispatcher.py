@@ -1,16 +1,11 @@
 
-import sys
 import unittest
 
 from pathlib import Path
 from unittest.mock import patch
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from specialist_dispatcher import dispatch_specialist_tool
-from tool_contract import ToolResult
+from incident_assistant.tools.specialist_dispatcher import dispatch_specialist_tool
+from incident_assistant.contracts.tool_contract import ToolResult
 
 
 class TestSpecialistDispatcher(unittest.TestCase):
@@ -23,7 +18,7 @@ class TestSpecialistDispatcher(unittest.TestCase):
         }
 
         with patch(
-            "specialist_dispatcher.dispatch_tool"
+            "incident_assistant.tools.specialist_dispatcher.dispatch_tool"
         ) as mocked_dispatch:
 
             result = dispatch_specialist_tool(
@@ -41,7 +36,7 @@ class TestSpecialistDispatcher(unittest.TestCase):
 
     def test_unknown_tool_forbidden(self):
         with patch(
-            "specialist_dispatcher.dispatch_tool"
+            "incident_assistant.tools.specialist_dispatcher.dispatch_tool"
         ) as mocked_dispatch:
 
             result = dispatch_specialist_tool(
@@ -73,7 +68,7 @@ class TestSpecialistDispatcher(unittest.TestCase):
         }
 
         with patch(
-            "specialist_dispatcher.dispatch_tool",
+            "incident_assistant.tools.specialist_dispatcher.dispatch_tool",
             return_value=fake_result,
         ) as mocked_dispatch:
 

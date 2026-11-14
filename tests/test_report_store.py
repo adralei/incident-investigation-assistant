@@ -1,15 +1,10 @@
 
-import sys
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from report_schema import IncidentReport
-from report_store import save_report
+from incident_assistant.contracts.report_schema import IncidentReport
+from incident_assistant.reports.report_store import save_report
 
 
 class TestReportStore(unittest.TestCase):

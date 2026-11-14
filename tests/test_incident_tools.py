@@ -1,5 +1,4 @@
 
-import sys
 import unittest
 
 from pathlib import Path
@@ -8,12 +7,10 @@ from pydantic import ValidationError
 
 
 # src klasöründeki modülleri import edebilmek için
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from incident_tools import get_logs, get_deployments
-from service_tools import get_service_status
-from tool_contract import ToolResult
+from incident_assistant.tools.incident_tools import get_logs, get_deployments
+from incident_assistant.tools.service_tools import get_service_status
+from incident_assistant.contracts.tool_contract import ToolResult
 
 
 START = "2026-10-20T09:00:00Z"
@@ -63,7 +60,7 @@ class TestIncidentTools(unittest.TestCase):
 
     def test_log_file_error(self):
         with patch(
-            "inspect_logs.LOG_FILE",
+            "incident_assistant.data.inspect_logs.LOG_FILE",
             Path("nonexistent_logs.jsonl")
         ):
             result = get_logs("checkout-api", START, END)
@@ -74,7 +71,7 @@ class TestIncidentTools(unittest.TestCase):
 
     def test_deployment_file_error(self):
         with patch(
-            "incident_tools.DEPLOYMENT_FILE",
+            "incident_assistant.tools.incident_tools.DEPLOYMENT_FILE",
             Path("nonexistent_deployments.jsonl")
         ):
             result = get_deployments(
@@ -95,7 +92,10 @@ class TestIncidentTools(unittest.TestCase):
                 encoding="utf-8"
             )
 
-            with patch("inspect_logs.LOG_FILE", bad_file):
+            with patch(
+                "incident_assistant.data.inspect_logs.LOG_FILE",
+                bad_file,
+            ):
                 result = get_logs("checkout-api", START, END)
 
         self.assertEqual(result.status, "error")

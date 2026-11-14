@@ -1,8 +1,8 @@
 
 from typing import Any
 
-from tool_contract import ToolError, ToolResult
-from tool_dispatcher import dispatch_tool
+from incident_assistant.contracts.tool_contract import ToolError, ToolResult
+from incident_assistant.tools.tool_dispatcher import dispatch_tool
 
 
 ALLOWED_SPECIALIST_TOOLS = frozenset({

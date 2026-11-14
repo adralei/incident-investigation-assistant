@@ -1,14 +1,9 @@
 
-import sys
 import unittest
 from pathlib import Path
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from report_schema import IncidentReport
-from compare_reports import evaluate_report
+from incident_assistant.contracts.report_schema import IncidentReport
+from incident_assistant.evaluation.compare_reports import evaluate_report
 
 
 def make_report(

@@ -1,20 +1,15 @@
 
-import sys
 import unittest
 
 from pathlib import Path
 from unittest.mock import patch
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-from evidence_support import (
+from incident_assistant.evidence.evidence_support import (
     EvidenceClaim,
     collect_evidence_records,
     verify_claim,
 )
-from tool_contract import ToolResult, ToolError
+from incident_assistant.contracts.tool_contract import ToolResult, ToolError
 
 
 class TestEvidenceSupport(unittest.TestCase):
@@ -101,7 +96,7 @@ class TestEvidenceSupport(unittest.TestCase):
             )
 
         with patch(
-            "evidence_support.get_logs",
+            "incident_assistant.evidence.evidence_support.get_logs",
             new=failing_get_logs,
         ):
             with self.assertRaises(RuntimeError) as context:

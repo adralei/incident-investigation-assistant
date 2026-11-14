@@ -2,10 +2,10 @@
 import json
 from pathlib import Path
 
-from report_schema import IncidentReport
+from incident_assistant.contracts.report_schema import IncidentReport
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+from incident_assistant.core.paths import PROJECT_ROOT
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "evals" / "results"
 
 ALLOWED_ARCHITECTURES = {
